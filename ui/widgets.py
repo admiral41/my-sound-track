@@ -302,7 +302,7 @@ class NavBtn(QPushButton):
 
 
 # ── Branded Header ────────────────────────────────────────────────────────────
-# Logo
+class BrandedHeader(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("TopHeader")
