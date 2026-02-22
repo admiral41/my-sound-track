@@ -255,7 +255,7 @@ class ResultsPage(QWidget):
         self.engine = engine
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame) # Clean look
+        scroll.setFrameShape(QFrame.NoFrame) # Clean look
         
         self._container = QWidget()
         self._lay = QVBoxLayout(self._container)
@@ -424,10 +424,10 @@ class LibraryPage(QWidget):
         # Table
         self._tbl = QTableWidget(0, 3)
         self._tbl.setHorizontalHeaderLabels(["Title", "Artist", "Dur"])
-        self._tbl.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        self._tbl.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Interactive)
-        self._tbl.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-        self._tbl.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._tbl.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self._tbl.horizontalHeader().setSectionResizeMode(1, QHeaderView.Interactive)
+        self._tbl.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self._tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._tbl.verticalHeader().setVisible(False)
         lay.addWidget(self._tbl)
         
