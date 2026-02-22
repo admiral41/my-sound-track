@@ -178,7 +178,7 @@ class IdentifyPage(QWidget):
         self._start_worker(mode, dur)
 
     def _browse_file(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Open Audio", "", "Audio Files (*.wav *.mp3 *.flac *.ogg)")
+        path, _ = QFileDialog.getOpenFileName(self, "Open Audio", "", "Audio Files (*.wav *.mp3 *.flac *.ogg)", options=QFileDialog.DontUseNativeDialog)
         if path:
             self._load_file(path)
 
@@ -546,13 +546,13 @@ class AddSongsPage(QWidget):
         lay.addStretch()
 
     def _browse_single(self):
-        p, _ = QFileDialog.getOpenFileName(self, "Select File", "", "Audio Files (*.wav *.mp3 *.flac *.ogg)")
+        p, _ = QFileDialog.getOpenFileName(self, "Select File", "", "Audio Files (*.wav *.mp3 *.flac *.ogg)", options=QFileDialog.DontUseNativeDialog)
         if p:
             self._fp.setText(p)
             self._title.setText(os.path.splitext(os.path.basename(p))[0])
 
     def _browse_dir(self):
-        p = QFileDialog.getExistingDirectory(self, "Select Folder")
+        p = QFileDialog.getExistingDirectory(self, "Select Folder", options=QFileDialog.DontUseNativeDialog)
         if p:
             self._dir.setText(p)
 

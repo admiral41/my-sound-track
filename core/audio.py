@@ -76,16 +76,30 @@ def _resample(audio: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:
 
 def load_audio_file(filepath: str, target_sr: int = SAMPLE_RATE) -> Tuple[np.ndarray, int]:
     """
-    Universal audio loader.
-    Native WAV support always.
-    MP3/FLAC/OGG supported if pydub+ffmpeg installed (optional).
+    Universal audio loader — tries multiple backends:
+    1. WAV:  stdlib wave (always works)
+    2. FLAC/OGG: soundfile (needs libsndfile, already on Ubuntu)
+    3. MP3/any: pydub (needs ffmpeg)
     """
     ext = os.path.splitext(filepath)[1].lower()
 
     if ext == '.wav':
         return load_wav(filepath, target_sr)
 
-    # Try pydub (optional — needs ffmpeg)
+    # Try soundfile (works for FLAC, OGG, and some MP3)
+    # libsndfile is usually pre-installed: sudo apt install libsndfile1
+    try:
+        import soundfile as sf
+        audio, sr = sf.read(filepath, dtype='float32', always_2d=False)
+        if audio.ndim == 2:              # stereo -> mono
+            audio = audio.mean(axis=1)
+        if sr != target_sr:
+            audio = _resample(audio, sr, target_sr)
+        return audio.astype(np.float32), target_sr
+    except Exception:
+        pass
+
+    # Try pydub (optional — needs ffmpeg installed separately)
     try:
         from pydub import AudioSegment
         seg = AudioSegment.from_file(filepath)
@@ -96,9 +110,9 @@ def load_audio_file(filepath: str, target_sr: int = SAMPLE_RATE) -> Tuple[np.nda
         pass
 
     raise ValueError(
-        f"Cannot load '{os.path.basename(filepath)}'.\n"
-        f"Supported: WAV (native), MP3/FLAC/OGG (requires ffmpeg + pydub).\n"
-        f"Convert with: ffmpeg -i input.mp3 -ar 22050 -ac 1 output.wav"
+        "Cannot load '{}'. Supported: WAV (always), FLAC/OGG (install: pip install soundfile), "
+        "MP3 (install ffmpeg + pydub). Quickest fix: convert to WAV first:\n"
+        "  ffmpeg -i input.mp3 -ar 22050 -ac 1 output.wav".format(os.path.basename(filepath))
     )
 
 
