@@ -5,7 +5,7 @@ from core.engine import MashupIDEngine
 
 def create_test_assets():
     print("Generating synthetic test audio...")
-    duration = 10.0
+    duration = 60.0
     t = np.linspace(0, duration, int(SAMPLE_RATE * duration), endpoint=False)
     # A multi-frequency signal to make fingerprinting more interesting
     audio = 0.5 * np.sin(2 * np.pi * 440 * t) + 0.3 * np.sin(2 * np.pi * 880 * t)

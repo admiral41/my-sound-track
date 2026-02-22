@@ -48,6 +48,7 @@ class MashupIDEngine:
     STATUS_ANALYZING = "analyzing"
     STATUS_DONE      = "done"
     STATUS_ERROR     = "error"
+    STATUS_STOPPING  = "stopping"   # stop-and-analyze requested
 
     def __init__(self, db_path: Optional[str] = None):
         if db_path is None:
@@ -92,35 +93,42 @@ class MashupIDEngine:
 
     # ── Identify from microphone ──────────────────────────────────────────────
 
-    def identify_from_microphone(self, duration: float = 10.0, mashup_mode: bool = False):
+    def identify_from_microphone(self, mashup_mode: bool = False):
+        """Record until stop_and_analyze() or stop() is called."""
         if self._status in (self.STATUS_RECORDING, self.STATUS_ANALYZING):
             return
 
         def _run():
             try:
-                self._emit_status(self.STATUS_RECORDING, f"Recording {duration:.0f}s…")
+                self._emit_status(self.STATUS_RECORDING, "Recording... Press stop when ready.")
                 self._emit_progress(0)
 
                 self.recorder.start_recording()
-                steps = int(duration * 10)
-                for i in range(steps):
-                    if self._status != self.STATUS_RECORDING:
-                        break
+                elapsed = 0
+                # Loop until user signals stop (stop_and_analyze or stop/cancel)
+                while self._status == self.STATUS_RECORDING:
                     time.sleep(0.1)
-                    self._emit_progress(int((i + 1) / steps * 45))
+                    elapsed += 0.1
+                    # Pulse progress bar back and forth to show activity
+                    pulse = int((elapsed % 4) / 4 * 80)
+                    self._emit_progress(pulse)
 
-                audio = self.recorder.stop_recording()
+                # If user cancelled (plain stop), discard
                 if self._status == self.STATUS_IDLE:
+                    self.recorder.stop_recording()
                     return
+
+                # STATUS_STOPPING = stop-and-analyze
+                self._emit_status(self.STATUS_ANALYZING, "Analyzing...")
+                self._emit_progress(50)
+                audio = self.recorder.stop_recording()
 
                 if audio is None or len(audio) < SAMPLE_RATE:
-                    self._emit_status(self.STATUS_ERROR, "No audio captured")
+                    self._emit_status(self.STATUS_ERROR, "Recording too short")
                     return
 
-                self._emit_status(self.STATUS_ANALYZING, "Analyzing…")
                 result = self._analyze(audio, SAMPLE_RATE, mashup_mode,
-                                       prog_start=45, prog_end=100,
-                                       is_cancelled=lambda: self._status == self.STATUS_IDLE)
+                                       prog_start=50, prog_end=100)
                 self._emit_progress(100)
                 self._emit_status(self.STATUS_DONE, "Complete")
                 if self._cb_result:
@@ -225,14 +233,19 @@ class MashupIDEngine:
 
         return res
 
-    def stop(self):
-        """Cancels active recording or analysis by signalling the engine thread."""
+    def stop_and_analyze(self):
+        """Stop recording and proceed to analyze what was captured."""
         with self._lock:
-            if self._status in (self.STATUS_RECORDING, self.STATUS_ANALYZING):
+            if self._status == self.STATUS_RECORDING:
+                self._status = self.STATUS_STOPPING
+
+    def stop(self):
+        """Cancel active recording or analysis (discards audio)."""
+        with self._lock:
+            if self._status in (self.STATUS_RECORDING, self.STATUS_ANALYZING, self.STATUS_STOPPING):
                 self._status = self.STATUS_IDLE
-                # We signal the recorder to stop but don't join here to avoid UI freeze
-                self.recorder._recording = False 
-                self._emit_status(self.STATUS_IDLE, "Stopping...")
+                self.recorder._recording = False
+                self._emit_status(self.STATUS_IDLE, "Stopped")
 
     # ── Indexing ──────────────────────────────────────────────────────────────
 
