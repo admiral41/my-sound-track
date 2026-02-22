@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 MashupID - Cross-Platform Song Database & Matching Engine
 SQLite backend — works identically on Windows, Linux, macOS, Jetson Nano.
@@ -10,44 +11,51 @@ import time
 import logging
 import numpy as np
 from collections import Counter, defaultdict
-from dataclasses import dataclass
 from typing import List, Optional, Dict, Any, Tuple
 
 log = logging.getLogger("MashupID.DB")
 
 
-# ─── Data Classes ────────────────────────────────────────────────────────────
+# ─── Data Classes (Python 3.6 compatible, no dataclasses module) ──────────────
 
-@dataclass
-class SongMetadata:
-    song_id:           int
-    title:             str
-    artist:            str
-    album:             str  = ""
-    year:              str  = ""
-    duration:          float = 0.0
-    genre:             str  = ""
-    file_path:         str  = ""
-    date_added:        str  = ""
-    fingerprint_count: int  = 0
-    cover_art_path:    str  = ""
-    tags:              str  = ""
+class SongMetadata(object):
+    def __init__(self, song_id, title, artist,
+                 album="", year="", duration=0.0, genre="",
+                 file_path="", date_added="", fingerprint_count=0,
+                 cover_art_path="", tags=""):
+        self.song_id           = song_id
+        self.title             = title
+        self.artist            = artist
+        self.album             = album
+        self.year              = year
+        self.duration          = duration
+        self.genre             = genre
+        self.file_path         = file_path
+        self.date_added        = date_added
+        self.fingerprint_count = fingerprint_count
+        self.cover_art_path    = cover_art_path
+        self.tags              = tags
 
-@dataclass
-class MatchResult:
-    song_id:              int
-    title:                str
-    artist:               str
-    album:                str
-    year:                 str
-    genre:                str
-    confidence:           float
-    match_count:          int
-    offset_seconds:       float
-    is_mashup_component:  bool
-    cover_art_path:       str  = ""
-    mashup_segment_start: float = 0.0
-    mashup_segment_end:   float = 0.0
+class MatchResult(object):
+    def __init__(self, song_id, title, artist, album, year, genre,
+                 confidence, match_count, offset_seconds,
+                 is_mashup_component,
+                 cover_art_path="",
+                 mashup_segment_start=0.0,
+                 mashup_segment_end=0.0):
+        self.song_id              = song_id
+        self.title                = title
+        self.artist               = artist
+        self.album                = album
+        self.year                 = year
+        self.genre                = genre
+        self.confidence           = confidence
+        self.match_count          = match_count
+        self.offset_seconds       = offset_seconds
+        self.is_mashup_component  = is_mashup_component
+        self.cover_art_path       = cover_art_path
+        self.mashup_segment_start = mashup_segment_start
+        self.mashup_segment_end   = mashup_segment_end
 
 
 # ─── Database ─────────────────────────────────────────────────────────────────
