@@ -147,8 +147,8 @@ def main():
     
     # Dark Theme Palette (Fallback for widgets ignoring stylesheet)
     pal = QPalette()
-    pal.setColor(QPalette.ColorRole.Window, QColor(C_BG))
-    pal.setColor(QPalette.ColorRole.WindowText, QColor(C_TEXT))
+    pal.setColor(QPalette.Window, QColor(C_BG))
+    pal.setColor(QPalette.WindowText, QColor(C_TEXT))
     app.setPalette(pal)
 
     win = MainWindow()
