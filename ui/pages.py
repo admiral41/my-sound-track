@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
     QScrollArea, QComboBox, QSlider, QFileDialog, QTableWidget,
     QTableWidgetItem, QHeaderView, QAbstractItemView, QMessageBox,
-    QLineEdit, QFormLayout, QProgressBar, QFrame
+    QLineEdit, QFormLayout, QProgressBar, QFrame, QSpinBox
 )
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QSize
 from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QColor
@@ -68,19 +68,18 @@ class IdentifyPage(QWidget):
         mv.addWidget(self._mode)
         cc.main_layout.addLayout(mv) # Add to card's layout
         
-        # Duration Slider
+        # Duration Input (free entry — any number of seconds)
         dv = QVBoxLayout()
         dh = QHBoxLayout()
-        dh.addWidget(QLabel("DURATION", styleSheet=f"color:{C_MUTED}; font-size:7pt; font-weight:bold;"))
+        dh.addWidget(QLabel("RECORD DURATION", styleSheet=f"color:{C_MUTED}; font-size:7pt; font-weight:bold;"))
         dh.addStretch()
-        self._dur_lbl = QLabel("10s", styleSheet=f"color:{C_ACCENT}; font-weight:bold; font-size:8pt;")
-        dh.addWidget(self._dur_lbl)
+        self._dur_spin = QSpinBox()
+        self._dur_spin.setRange(5, 3600)  # 5s to 60 minutes
+        self._dur_spin.setValue(10)
+        self._dur_spin.setSuffix(" sec")
+        self._dur_spin.setToolTip("Recording duration in seconds (any value)")
+        dh.addWidget(self._dur_spin)
         dv.addLayout(dh)
-        
-        self._dur_sl = QSlider(Qt.Horizontal)
-        self._dur_sl.setRange(5, 30); self._dur_sl.setValue(10)
-        self._dur_sl.valueChanged.connect(lambda v: self._dur_lbl.setText(f"{v}s"))
-        dv.addWidget(self._dur_sl)
         cc.main_layout.addLayout(dv) # Add to card's layout
         
         lay.addWidget(cc)
@@ -149,7 +148,8 @@ class IdentifyPage(QWidget):
 
     def _on_mode(self, idx):
         if idx == 1: # Mashup
-             if self._dur_sl.value() < 15: self._dur_sl.setValue(15)
+             if self._dur_spin.value() < 15:
+                 self._dur_spin.setValue(15)
              self._sub.setText("Mashup Mode: Analyzes segments to find multiple songs")
         else:
              self._sub.setText("Standard Mode: Identifies a single track")
@@ -166,7 +166,7 @@ class IdentifyPage(QWidget):
             return
         
         mode = "mashup" if self._mode.currentIndex() == 1 else "standard"
-        dur  = self._dur_sl.value()
+        dur  = self._dur_spin.value()
         
         self._rbtn.set_recording(True)
         self._tsec = dur
@@ -192,7 +192,7 @@ class IdentifyPage(QWidget):
          self._wave.set_active(True)
          
          mode = "mashup" if self._mode.currentIndex() == 1 else "standard"
-         self._start_worker(mode, self._dur_sl.value(), path)
+         self._start_worker(mode, self._dur_spin.value(), path)
 
     def _start_worker(self, mode, dur, fp=""):
         self._worker = IdentifyWorker(self.engine, mode, dur, fp)
