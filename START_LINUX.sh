@@ -20,7 +20,7 @@ echo " Platform: $OS / $ARCH"
 if [[ "$OS" == "Linux" ]]; then
     echo " Installing system packages..."
     if command -v apt-get &>/dev/null; then
-        sudo apt-get install -y libportaudio2 portaudio19-dev python3-pip 2>/dev/null || true
+        sudo apt-get install -y libportaudio2 portaudio19-dev python3-pip python3-pyqt5 2>/dev/null || true
     elif command -v dnf &>/dev/null; then
         sudo dnf install -y portaudio-devel python3-pip 2>/dev/null || true
     elif command -v pacman &>/dev/null; then

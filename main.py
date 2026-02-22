@@ -10,12 +10,12 @@ import platform
 # Ensure we can import from core and ui
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from PyQt6.QtWidgets import (
+from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
     QStackedWidget, QLabel, QFrame
 )
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QIcon, QPalette, QColor
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QIcon, QPalette, QColor
 
 from core.engine import MashupIDEngine
 from ui.styles import C_BG, C_SURFACE, C_ACCENT, C_TEXT, GLOBAL_STYLE, C_BORDER
@@ -153,7 +153,7 @@ def main():
     win = MainWindow()
     win.show()
     
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

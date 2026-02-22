@@ -96,12 +96,12 @@ def install_python_deps():
     print("\n  ── Python Packages ──────────────────────────────────")
 
     # Core scientific packages
-    print("  Installing numpy, scipy…")
-    pip("numpy", "scipy")
+    print("  Installing numpy, scipy (legacy versions for 3.6)…")
+    pip("numpy<1.20", "scipy<1.6")
 
     # GUI framework
-    print("  Installing PyQt6…")
-    pip("PyQt6")
+    print("  Installing PyQt5…")
+    pip("PyQt5")
 
     # Audio capture — sounddevice is the best cross-platform option
     print("  Installing sounddevice…")

@@ -3,7 +3,7 @@ MashupID - Background Worker Threads
 """
 
 import threading
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal
 from core.engine import MashupIDEngine
 
 class IdentifyWorker(QThread):

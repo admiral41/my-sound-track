@@ -3,14 +3,14 @@ MashupID - Custom Reusable Widgets
 """
 import os
 import numpy as np
-from PyQt6.QtWidgets import (
+from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame,
     QProgressBar, QGraphicsDropShadowEffect
 )
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QRect, QSize, QPoint
-from PyQt6.QtGui import (
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QRect, QSize, QPoint
+from PyQt5.QtGui import (
     QPainter, QPen, QBrush, QColor, QLinearGradient, QRadialGradient,
-    QFont, QIcon, QCursor
+    QFont, QIcon, QCursor, QPixmap
 )
 from .styles import *
 
@@ -43,7 +43,7 @@ class Gauge(QWidget):
 
     def paintEvent(self, _):
         p = QPainter(self)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.Antialiasing)
         rect = self.rect().adjusted(4,4,-4,-4)
         
         # Background track
@@ -51,7 +51,7 @@ class Gauge(QWidget):
         p.drawEllipse(rect)
 
         # Value arc
-        p.setPen(QPen(self.color, 4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.setPen(QPen(self.color, 4, Qt.SolidLine, Qt.RoundCap))
         span = int(self.value * 360 * 16)
         p.drawArc(rect, 90 * 16, -span)
         p.end()
@@ -71,7 +71,7 @@ class WaveformWidget(QWidget):
         self._timer  = QTimer(self)
         self._timer.timeout.connect(self._tick)
         self._timer.start(50)
-        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, False)
+        self.setAttribute(Qt.WA_StyledBackground, False)
 
     def set_active(self, v: bool): self._active = v
     def set_level(self, v: float): self._level  = min(max(v, 0.0), 1.0) # Clamp
@@ -91,7 +91,7 @@ class WaveformWidget(QWidget):
 
     def paintEvent(self, _):
         p = QPainter(self)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.Antialiasing)
         W, H = self.width(), self.height()
         mid  = H / 2
         
@@ -122,7 +122,7 @@ class WaveformWidget(QWidget):
             g.setColorAt(0.0, c1) 
             g.setColorAt(1.0, c2)
 
-            p.setPen(Qt.PenStyle.NoPen)
+            p.setPen(Qt.NoPen)
             p.setBrush(QBrush(g))
             
             # Rounded bars
@@ -147,7 +147,7 @@ class RecordBtn(QWidget):
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._tick)
         self._timer.start(16) # ~60 FPS
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setCursor(Qt.PointingHandCursor)
 
     def set_recording(self, v):  self._rec = v
     def set_analyzing(self, v):  self._ana = v
@@ -163,7 +163,7 @@ class RecordBtn(QWidget):
 
     def paintEvent(self, _):
         p  = QPainter(self)
-        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.Antialiasing)
         W, H = self.width(), self.height()
         cx, cy = W / 2, H / 2
         ro = W / 2 - 8
@@ -176,13 +176,13 @@ class RecordBtn(QWidget):
             alpha  = int(40 * self._pulse)
             for i in range(3):
                 p.setPen(QPen(QColor(c_glow.red(), c_glow.green(), c_glow.blue(), alpha), 2))
-                p.setBrush(Qt.BrushStyle.NoBrush)
+                p.setBrush(Qt.NoBrush)
                 rad = ro + (i + 1) * 5 + (10 * self._pulse)
                 p.drawEllipse(QPoint(int(cx), int(cy)), int(rad), int(rad))
 
         # 2. Base Track
         p.setPen(QPen(QColor(C_BORDER), 3))
-        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.setBrush(Qt.NoBrush)
         p.drawEllipse(QPoint(int(cx), int(cy)), int(ro), int(ro))
 
         # 3. Rotating Arc
@@ -191,7 +191,7 @@ class RecordBtn(QWidget):
         p.rotate(self._angle)
         
         c_arc = QColor(C_ACCENT2 if self._rec else (C_ACCENT3 if self._ana else C_ACCENT))
-        p.setPen(QPen(c_arc, 4, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.setPen(QPen(c_arc, 4, Qt.SolidLine, Qt.RoundCap))
         
         span = 90
         if self._rec: span = 120
@@ -234,20 +234,20 @@ class RecordBtn(QWidget):
         p.setFont(f_icon)
         p.setPen(c_arc)
         # Bounding box cy-32 to cy-2 (30px high)
-        p.drawText(QRect(0, int(cy - 32), int(W), 30), Qt.AlignmentFlag.AlignCenter, icon_txt)
+        p.drawText(QRect(0, int(cy - 32), int(W), 30), Qt.AlignCenter, icon_txt)
 
         f_status = QFont(FONT_FAMILY, 5)
         f_status.setBold(True)
-        f_status.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 1.0)
+        f_status.setLetterSpacing(QFont.AbsoluteSpacing, 1.0)
         p.setFont(f_status)
         p.setPen(QColor(C_MUTED))
         # Bounding box cy+8 to cy+23 (15px high) to clear the icon and lower arc
-        p.drawText(QRect(0, int(cy + 8), int(W), 15), Qt.AlignmentFlag.AlignCenter, status_txt)
+        p.drawText(QRect(0, int(cy + 8), int(W), 15), Qt.AlignCenter, status_txt)
 
         p.end()
 
     def mousePressEvent(self, e):
-        if e.button() == Qt.MouseButton.LeftButton:
+        if e.button() == Qt.LeftButton:
             self.clicked.emit()
     
     def enterEvent(self, _): self._hover = True; self.update()
@@ -259,7 +259,7 @@ class NavBtn(QPushButton):
     def __init__(self, icon: str, label: str, parent=None):
         super().__init__(parent)
         self.setCheckable(True)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setCursor(Qt.PointingHandCursor)
         self.setFixedHeight(60) # Taller for touch
         self.setMinimumWidth(80)
         
@@ -268,11 +268,11 @@ class NavBtn(QPushButton):
         lay.setSpacing(2)
         
         self.icon_lbl = QLabel(icon)
-        self.icon_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.icon_lbl.setAlignment(Qt.AlignCenter)
         self.icon_lbl.setStyleSheet("font-size: 16pt; background: transparent; border: none;")
         
         self.txt_lbl = QLabel(label.upper())
-        self.txt_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.txt_lbl.setAlignment(Qt.AlignCenter)
         self.txt_lbl.setStyleSheet(f"font-size: 7pt; font-weight: bold; color: {C_MUTED}; background: transparent; border: none;")
         
         lay.addWidget(self.icon_lbl)
@@ -300,9 +300,7 @@ class NavBtn(QPushButton):
 
 
 # ── Branded Header ────────────────────────────────────────────────────────────
-from PyQt6.QtGui import QPixmap
-
-class BrandedHeader(QWidget):
+# Logo
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("TopHeader")
@@ -314,7 +312,7 @@ class BrandedHeader(QWidget):
         self.logo = QLabel()
         pix = QPixmap(os.path.join("img", "logo.png"))
         if not pix.isNull():
-            self.logo.setPixmap(pix.scaled(120, 30, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+            self.logo.setPixmap(pix.scaled(120, 30, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         else:
             self.logo.setText("MASHUP ID")
             self.logo.setStyleSheet("font-weight: 800; font-size: 14pt; color: white;")
@@ -325,7 +323,7 @@ class BrandedHeader(QWidget):
         # Help Button
         self.help_btn = QPushButton("?")
         self.help_btn.setFixedSize(30, 30)
-        self.help_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.help_btn.setCursor(Qt.PointingHandCursor)
         self.help_btn.setStyleSheet(f"""
             QPushButton {{
                 background: {C_SURFACE2};
@@ -353,7 +351,7 @@ class HelpOverlay(QWidget):
         close_btn.setFixedSize(40, 40)
         close_btn.clicked.connect(self.hide)
         close_btn.setStyleSheet("background: transparent; color: white; font-size: 18pt; border: none;")
-        lay.addWidget(close_btn, 0, Qt.AlignmentFlag.AlignRight)
+        lay.addWidget(close_btn, 0, Qt.AlignRight)
         
         title = QLabel("HOW TO USE")
         title.setStyleSheet(f"font-size: 20pt; font-weight: 800; color: {C_ACCENT};")
@@ -377,7 +375,7 @@ class HelpOverlay(QWidget):
         
         footer = QLabel("MASHUP ID v2.0 • FOR JETSON NANO")
         footer.setStyleSheet(f"color: {C_MUTED}; font-size: 8pt;")
-        footer.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        footer.setAlignment(Qt.AlignCenter)
         lay.addWidget(footer)
 
     def showEvent(self, _):
@@ -394,7 +392,7 @@ class SplashScreen(QWidget):
         
         lay = QVBoxLayout(self)
         lay.setContentsMargins(0, 40, 0, 40)
-        lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lay.setAlignment(Qt.AlignCenter)
         
         # Initial stretch to push everything towards center/bottom
         lay.addStretch(2)
@@ -403,15 +401,15 @@ class SplashScreen(QWidget):
         self.main_logo = QLabel()
         pix_app = QPixmap(os.path.join("img", "logo.png"))
         if not pix_app.isNull():
-            self.main_logo.setPixmap(pix_app.scaled(280, 280, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
-        lay.addWidget(self.main_logo, 0, Qt.AlignmentFlag.AlignCenter)
+            self.main_logo.setPixmap(pix_app.scaled(280, 280, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        lay.addWidget(self.main_logo, 0, Qt.AlignCenter)
         
         lay.addSpacing(20)
         
         # 2. Status & Progress (Grouped with logo)
         self.title = QLabel("POWERING UP")
         self.title.setStyleSheet(f"font-size: 10pt; font-weight: bold; letter-spacing: 4px; color: {C_MUTED};")
-        lay.addWidget(self.title, 0, Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(self.title, 0, Qt.AlignCenter)
         
         lay.addSpacing(15)
         
@@ -422,7 +420,7 @@ class SplashScreen(QWidget):
             QProgressBar {{ background: {C_SURFACE2}; border: none; border-radius: 2px; }}
             QProgressBar::chunk {{ background: {C_ACCENT}; border-radius: 2px; }}
         """)
-        lay.addWidget(self.pbar, 0, Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(self.pbar, 0, Qt.AlignCenter)
         
         # Main stretch to push branding to bottom
         lay.addStretch(3)
@@ -431,14 +429,14 @@ class SplashScreen(QWidget):
         fv = QVBoxLayout()
         powered_by = QLabel("POWERED BY")
         powered_by.setStyleSheet(f"color: {C_MUTED}; font-size: 7pt; font-weight: bold; letter-spacing: 2px;")
-        powered_by.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        powered_by.setAlignment(Qt.AlignCenter)
         fv.addWidget(powered_by)
         
         self.ku_logo = QLabel()
         pix_ku = QPixmap(os.path.join("img", "KU-Logo-Color.png"))
         if not pix_ku.isNull():
-            self.ku_logo.setPixmap(pix_ku.scaled(130, 45, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
-        fv.addWidget(self.ku_logo, 0, Qt.AlignmentFlag.AlignCenter)
+            self.ku_logo.setPixmap(pix_ku.scaled(130, 45, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        fv.addWidget(self.ku_logo, 0, Qt.AlignCenter)
         
         lay.addLayout(fv)
         

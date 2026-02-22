@@ -4,14 +4,14 @@ MashupID - Application Pages
 
 import os
 import threading
-from PyQt6.QtWidgets import (
+from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
     QScrollArea, QComboBox, QSlider, QFileDialog, QTableWidget,
     QTableWidgetItem, QHeaderView, QAbstractItemView, QMessageBox,
     QLineEdit, QFormLayout, QProgressBar, QFrame
 )
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize
-from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QColor
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QSize
+from PyQt5.QtGui import QDragEnterEvent, QDropEvent, QColor
 
 from .styles import *
 from .widgets import Card, Gauge, WaveformWidget, RecordBtn, NavBtn
@@ -41,7 +41,7 @@ class IdentifyPage(QWidget):
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setFrameShape(QFrame.NoFrame)
         scroll.setStyleSheet("background: transparent;")
         
         container = QWidget()
@@ -51,7 +51,7 @@ class IdentifyPage(QWidget):
 
         self._sub = QLabel("LISTENING MODE")
         self._sub.setStyleSheet(f"color: {C_ACCENT}; font-size: 8pt; font-weight: bold; letter-spacing: 2px;")
-        lay.addWidget(self._sub, 0, Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(self._sub, 0, Qt.AlignCenter)
 
         # Controls Card
         cc = Card()
@@ -75,7 +75,7 @@ class IdentifyPage(QWidget):
         dh.addWidget(self._dur_lbl)
         dv.addLayout(dh)
         
-        self._dur_sl = QSlider(Qt.Orientation.Horizontal)
+        self._dur_sl = QSlider(Qt.Horizontal)
         self._dur_sl.setRange(5, 30); self._dur_sl.setValue(10)
         self._dur_sl.valueChanged.connect(lambda v: self._dur_lbl.setText(f"{v}s"))
         dv.addWidget(self._dur_sl)
@@ -101,17 +101,17 @@ class IdentifyPage(QWidget):
         self._rbtn = RecordBtn()
         self._rbtn.setFixedSize(110, 110)
         self._rbtn.clicked.connect(self._toggle_rec)
-        rl.addWidget(self._rbtn, 0, Qt.AlignmentFlag.AlignCenter)
+        rl.addWidget(self._rbtn, 0, Qt.AlignCenter)
         
         self._tlbl = QLabel("", styleSheet=f"color:{C_ACCENT}; font-size:18pt; font-weight:bold;")
-        self._tlbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._tlbl.setAlignment(Qt.AlignCenter)
         self._tlbl.hide()
         rl.addWidget(self._tlbl)
         
         rl.addStretch()
         
         fb = QPushButton("📁  Load Audio File")
-        fb.setCursor(Qt.CursorShape.PointingHandCursor)
+        fb.setCursor(Qt.PointingHandCursor)
         fb.clicked.connect(self._browse_file)
         rl.addWidget(fb)
         
@@ -277,12 +277,12 @@ class ResultsPage(QWidget):
         h = self.engine.db.get_history(limit=5)
         
         l = QLabel("Ready to Identify")
-        l.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        l.setAlignment(Qt.AlignCenter)
         l.setStyleSheet(f"color:{C_TEXT}; font-size:16pt; font-weight:bold; padding-top:40px;")
         self._lay.addWidget(l)
         
         sub = QLabel("Start listening to see results here.")
-        sub.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sub.setAlignment(Qt.AlignCenter)
         sub.setStyleSheet(f"color:{C_MUTED}; font-size:10pt; padding-bottom:20px;")
         self._lay.addWidget(sub)
 
@@ -366,11 +366,11 @@ class ResultsPage(QWidget):
         
         # Stats / Mashup Time
         stats = QVBoxLayout()
-        stats.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        stats.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         
         l_conf = QLabel(f"{int(rval)}%")
         l_conf.setStyleSheet(f"color:{C_ACCENT if rval > 60 else C_MUTED}; font-size:13pt; font-weight:800;")
-        l_conf.setAlignment(Qt.AlignmentFlag.AlignRight)
+        l_conf.setAlignment(Qt.AlignRight)
         stats.addWidget(l_conf)
 
         # Segment Info
@@ -381,7 +381,7 @@ class ResultsPage(QWidget):
                 time_str = f"{int(s//60)}:{int(s%60):02d} - {int(e//60)}:{int(e%60):02d}"
                 seg_lbl = QLabel(time_str)
                 seg_lbl.setStyleSheet(f"color:{C_ACCENT3}; font-size:8pt; font-weight:bold;")
-                seg_lbl.setAlignment(Qt.AlignmentFlag.AlignRight)
+                seg_lbl.setAlignment(Qt.AlignRight)
                 stats.addWidget(seg_lbl)
         
         row.addLayout(stats)
