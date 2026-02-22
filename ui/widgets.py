@@ -410,7 +410,7 @@ class SplashScreen(QWidget):
         
         # 2. Status & Progress (Grouped with logo)
         self.title = QLabel("POWERING UP")
-        self.title.setStyleSheet(f"font-size: 10pt; font-weight: bold; letter-spacing: 4px; color: {C_MUTED};")
+        self.title.setStyleSheet(f"font-size: 10pt; font-weight: bold; color: {C_MUTED};")
         lay.addWidget(self.title, 0, Qt.AlignCenter)
         
         lay.addSpacing(15)
@@ -430,7 +430,7 @@ class SplashScreen(QWidget):
         # 3. Footer Branding (Bottom)
         fv = QVBoxLayout()
         powered_by = QLabel("POWERED BY")
-        powered_by.setStyleSheet(f"color: {C_MUTED}; font-size: 7pt; font-weight: bold; letter-spacing: 2px;")
+        powered_by.setStyleSheet(f"color: {C_MUTED}; font-size: 7pt; font-weight: bold;")
         powered_by.setAlignment(Qt.AlignCenter)
         fv.addWidget(powered_by)
         

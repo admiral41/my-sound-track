@@ -52,7 +52,7 @@ class IdentifyPage(QWidget):
         lay.setSpacing(15)
 
         self._sub = QLabel("LISTENING MODE")
-        self._sub.setStyleSheet(f"color: {C_ACCENT}; font-size: 8pt; font-weight: bold; letter-spacing: 2px;")
+        self._sub.setStyleSheet(f"color: {C_ACCENT}; font-size: 8pt; font-weight: bold;")
         lay.addWidget(self._sub, 0, Qt.AlignCenter)
 
         # Controls Card
@@ -118,7 +118,7 @@ class IdentifyPage(QWidget):
         rl.addWidget(fb)
         
         self._flbl = QLabel("No file loaded", styleSheet=f"color:{C_MUTED}; font-size:8pt;")
-        self._flbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._flbl.setAlignment(Qt.AlignCenter)
         rl.addWidget(self._flbl)
         rl.addSpacing(10)
         
@@ -405,7 +405,7 @@ class LibraryPage(QWidget):
         lay.setContentsMargins(16, 16, 16, 16); lay.setSpacing(12)
         
         h = QHBoxLayout()
-        h.addWidget(QLabel("LOCAL LIBRARY", styleSheet=f"color: {C_MUTED}; font-size: 8pt; font-weight: bold; letter-spacing: 2px;"))
+        h.addWidget(QLabel("LOCAL LIBRARY", styleSheet=f"color: {C_MUTED}; font-size: 8pt; font-weight: bold;"))
         h.addStretch()
         
         # Refresh btn
@@ -489,7 +489,7 @@ class AddSongsPage(QWidget):
         lay = QVBoxLayout(self)
         lay.setContentsMargins(16, 16, 16, 16); lay.setSpacing(12)
         
-        lay.addWidget(QLabel("IMPORT SONGS", styleSheet=f"color: {C_MUTED}; font-size: 8pt; font-weight: bold; letter-spacing: 2px;"))
+        lay.addWidget(QLabel("IMPORT SONGS", styleSheet=f"color: {C_MUTED}; font-size: 8pt; font-weight: bold;"))
         
         # Single Song Card
         c1 = Card()
