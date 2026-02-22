@@ -33,8 +33,26 @@ elif [[ "$OS" == "Darwin" ]]; then
 fi
 
 # ── Python check ─────────────────────────────────────────────────────
-PY=$(command -v python3 || command -v python)
-echo " Python: $($PY --version)"
+# Try to find a suitable Python version (3.9+)
+PY=""
+for cmd in python3.11 python3.10 python3.9 python3; do
+    if command -v "$cmd" &>/dev/null; then
+        VERSION=$("$cmd" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+        MAJOR=$(echo $VERSION | cut -d. -f1)
+        MINOR=$(echo $VERSION | cut -d. -f2)
+        if [ "$MAJOR" -eq 3 ] && [ "$MINOR" -ge 9 ]; then
+            PY=$(command -v "$cmd")
+            break
+        fi
+    fi
+done
+
+if [[ -z "$PY" ]]; then
+    # Fallback to whatever python3 is if no 3.9+ found (script will likely fail later)
+    PY=$(command -v python3 || command -v python)
+fi
+
+echo " Python: $($PY --version) [Using: $PY]"
 
 # ── Install Python packages ───────────────────────────────────────────
 echo " Installing Python packages..."
