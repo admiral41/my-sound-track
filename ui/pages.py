@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 """
-MashupID - Application Pages
+UI Pages for MashupID.
+ - Application Pages
 """
 
 import os
@@ -110,7 +112,7 @@ class IdentifyPage(QWidget):
         
         rl.addStretch()
         
-        fb = QPushButton("📁  Load Audio File")
+        fb = QPushButton("Load Audio File")
         fb.setCursor(Qt.PointingHandCursor)
         fb.clicked.connect(self._browse_file)
         rl.addWidget(fb)

@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 """
-MashupID - Custom Reusable Widgets
+Custom Widgets for MashupID.
+ - Custom Reusable Widgets
 """
 import os
 import numpy as np

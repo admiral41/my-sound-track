@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 MashupID - Main Application Entry Point
 Premium PyQt6 GUI for Song Identification.
@@ -74,7 +75,7 @@ class MainWindow(QMainWindow):
         nav_lay.setContentsMargins(10, 0, 10, 0)
         
         self.nav_items = []
-        config = [("🔍", "Identify"), ("📊", "Results"), ("📚", "Library"), ("➕", "Add")]
+        config = [("ID", "Identify"), ("STATS", "Results"), ("LIB", "Library"), ("ADD", "Add")]
         
         for i, (ico, lbl) in enumerate(config):
             btn = NavBtn(ico, lbl)
