@@ -421,14 +421,23 @@ class LibraryPage(QWidget):
         self._search.textChanged.connect(self._filter)
         lay.addWidget(self._search)
         
-        # Table
+        # Table — touch-friendly for 7-inch vertical
         self._tbl = QTableWidget(0, 3)
         self._tbl.setHorizontalHeaderLabels(["Title", "Artist", "Dur"])
         self._tbl.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self._tbl.horizontalHeader().setSectionResizeMode(1, QHeaderView.Interactive)
+        self._tbl.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self._tbl.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self._tbl.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._tbl.verticalHeader().setVisible(False)
+        self._tbl.verticalHeader().setDefaultSectionSize(44)  # touch-friendly row height
+        self._tbl.setWordWrap(False)
+        self._tbl.setStyleSheet(
+            "QTableWidget {{ color: #EEEEEE; font-size: 10pt; }}"
+            "QTableWidget::item {{ padding: 8px; color: #EEEEEE; }}"
+            "QTableWidget::item:selected {{ background: rgba(0,229,255,0.15); color: #00E5FF; }}"
+            "QHeaderView::section {{ background: #0a0a0a; color: #8899A6; "
+            "font-weight: bold; font-size: 8pt; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.08); }}"
+        )
         lay.addWidget(self._tbl)
         
         # Footer actions
@@ -452,27 +461,36 @@ class LibraryPage(QWidget):
     def _render(self, songs):
         self._tbl.setRowCount(len(songs))
         for r, s in enumerate(songs):
-            dur = f"{int(s.duration//60)}:{int(s.duration%60):02d}"
-            
-            t_item = QTableWidgetItem(s.title)
-            t_item.setData(Qt.ItemDataRole.UserRole, s.song_id)
-            
+            dur_min = int(s.duration // 60)
+            dur_sec = int(s.duration % 60)
+            dur = "{:d}:{:02d}".format(dur_min, dur_sec)
+
+            t_item = QTableWidgetItem(s.title or "Unknown")
+            t_item.setForeground(QColor(C_TEXT))
+            t_item.setData(Qt.UserRole, s.song_id)  # PyQt5: Qt.UserRole not Qt.ItemDataRole.UserRole
+
+            a_item = QTableWidgetItem(s.artist or "-")
+            a_item.setForeground(QColor(C_MUTED))
+
+            d_item = QTableWidgetItem(dur)
+            d_item.setForeground(QColor(C_MUTED))
+
             self._tbl.setItem(r, 0, t_item)
-            self._tbl.setItem(r, 1, QTableWidgetItem(s.artist))
-            self._tbl.setItem(r, 2, QTableWidgetItem(dur))
+            self._tbl.setItem(r, 1, a_item)
+            self._tbl.setItem(r, 2, d_item)
 
     def _delete_sel(self):
         rows = sorted(set(i.row() for i in self._tbl.selectedItems()), reverse=True)
         if not rows: return
-        
-        ans = QMessageBox.question(self, "Delete", f"Delete {len(rows)} songs?", 
-                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        if ans != QMessageBox.StandardButton.Yes: return
+
+        ans = QMessageBox.question(self, "Delete", "Delete {} songs?".format(len(rows)),
+                                   QMessageBox.Yes | QMessageBox.No)
+        if ans != QMessageBox.Yes: return
 
         for r in rows:
             item = self._tbl.item(r, 0)
             if item:
-                sid = item.data(Qt.ItemDataRole.UserRole)
+                sid = item.data(Qt.UserRole)
                 if sid is not None:
                      self.engine.delete_song(sid)
         self.refresh()
